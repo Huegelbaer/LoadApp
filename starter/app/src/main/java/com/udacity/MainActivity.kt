@@ -10,8 +10,10 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -30,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        _viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(this.application))
+        _viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(application))
             .get(MainViewModel::class.java)
 
         setContentView(R.layout.activity_main)
@@ -46,6 +48,10 @@ class MainActivity : AppCompatActivity() {
             val source = mapRadioButtonToSource(checkedId)
             _viewModel.onDownloadSourceSelected(source)
         }
+
+        _viewModel.downloadURL.observe(this, Observer {
+            Toast.makeText(application, it, Toast.LENGTH_LONG).show()
+        })
     }
 
     private val receiver = object : BroadcastReceiver() {
