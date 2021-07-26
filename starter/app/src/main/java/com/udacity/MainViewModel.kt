@@ -31,7 +31,7 @@ class MainViewModel(): ViewModel() {
         }
     }
 
-    fun onDownloadSourceSelected(source: DownloadSource) {
+    fun onDownloadSourceSelected(source: DownloadSource?) {
         _selectedSource.value = source
     }
 }

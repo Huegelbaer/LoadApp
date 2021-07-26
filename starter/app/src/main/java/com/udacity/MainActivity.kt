@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModelProvider
@@ -40,11 +41,25 @@ class MainActivity : AppCompatActivity() {
         custom_button.setOnClickListener {
             download()
         }
+
+        radio_group.setOnCheckedChangeListener { _, checkedId ->
+            val source = mapRadioButtonToSource(checkedId)
+            _viewModel.onDownloadSourceSelected(source)
+        }
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+        }
+    }
+
+    private fun mapRadioButtonToSource(selectedId: Int): MainViewModel.DownloadSource? {
+        return when (selectedId) {
+            R.id.radio_button_glide -> MainViewModel.DownloadSource.GLIDE
+            R.id.radio_button_load_app -> MainViewModel.DownloadSource.PROJECT
+            R.id.radio_button_retrofit -> MainViewModel.DownloadSource.RETROFIT
+            else -> null
         }
     }
 
