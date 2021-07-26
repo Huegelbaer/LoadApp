@@ -9,8 +9,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.widget.RadioButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -19,12 +23,18 @@ class MainActivity : AppCompatActivity() {
 
     private var downloadID: Long = 0
 
+    private lateinit var _viewModel: MainViewModel
+
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        _viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory(application))
+            .get(MainViewModel::class.java)
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
@@ -33,11 +43,29 @@ class MainActivity : AppCompatActivity() {
         custom_button.setOnClickListener {
             download()
         }
+
+        radio_group.setOnCheckedChangeListener { _, checkedId ->
+            val source = mapRadioButtonToSource(checkedId)
+            _viewModel.onDownloadSourceSelected(source)
+        }
+
+        _viewModel.downloadURL.observe(this, Observer {
+            Toast.makeText(application, it, Toast.LENGTH_LONG).show()
+        })
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+        }
+    }
+
+    private fun mapRadioButtonToSource(selectedId: Int): MainViewModel.DownloadSource? {
+        return when (selectedId) {
+            R.id.radio_button_glide -> MainViewModel.DownloadSource.GLIDE
+            R.id.radio_button_load_app -> MainViewModel.DownloadSource.PROJECT
+            R.id.radio_button_retrofit -> MainViewModel.DownloadSource.RETROFIT
+            else -> null
         }
     }
 
