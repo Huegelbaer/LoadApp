@@ -9,11 +9,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -66,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun download() {
-        val url = _viewModel.downloadURL ?: return
+        val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
 
         val request =
             DownloadManager.Request(Uri.parse(url))
@@ -79,6 +77,11 @@ class MainActivity : AppCompatActivity() {
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
+    }
+
+    private fun showNoFileSelectedToast() {
+        val text = getText(R.string.no_file_selected_toast)
+        Toast.makeText(application, text, Toast.LENGTH_LONG).show()
     }
 
     companion object {
