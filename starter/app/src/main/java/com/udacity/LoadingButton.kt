@@ -111,7 +111,7 @@ class LoadingButton @JvmOverloads constructor(
     private fun drawCircleProgress(canvas: Canvas, startX: Float) {
         val radius = height.toFloat()/4
 
-        _paint.color = _textColor
+        _paint.color = _loadingCircleColor
         canvas.drawArc(
             startX,
             radius,

@@ -44,9 +44,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_height="60dp"
         android:layout_margin="20dp"
-        app:backgroundColor="@color/colorAccent"
+        app:backgroundColor="@color/colorPrimary"
+        app:loadingBackgroundColor="@color/colorPrimaryDark"
+        app:loadingCircleColor="@color/colorAccent"
         app:textColor="@color/white"
-        app:loadingBackgroundColor="@color/colorPrimary"
         app:text="Start download"
         app:layout_constraintBottom_toBottomOf="parent" />
 
