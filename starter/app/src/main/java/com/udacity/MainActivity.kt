@@ -48,10 +48,6 @@ class MainActivity : AppCompatActivity() {
             val source = mapRadioButtonToSource(checkedId)
             _viewModel.onDownloadSourceSelected(source)
         }
-
-        _viewModel.downloadURL.observe(this, Observer {
-            Toast.makeText(application, it, Toast.LENGTH_LONG).show()
-        })
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -70,8 +66,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun download() {
+        val url = _viewModel.downloadURL ?: return
+
         val request =
-            DownloadManager.Request(Uri.parse(URL))
+            DownloadManager.Request(Uri.parse(url))
                 .setTitle(getString(R.string.app_name))
                 .setDescription(getString(R.string.app_description))
                 .setRequiresCharging(false)
@@ -84,8 +82,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val URL =
-            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
         private const val CHANNEL_ID = "channelId"
     }
 
