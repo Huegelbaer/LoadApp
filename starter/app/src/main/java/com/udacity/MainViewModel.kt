@@ -18,20 +18,26 @@ class MainViewModel(): ViewModel() {
         private const val RETROFIT_URL = "https://github.com/square/retrofit/archive/master.zip"
     }
 
+
+    private var _source: DownloadSource? = null
+
     private var _selectedSource = MutableLiveData<DownloadSource>()
     val selectedSource: LiveData<DownloadSource>
         get() = _selectedSource
 
-    val downloadURL: LiveData<String?> = Transformations.map(_selectedSource) { source ->
-        when (source) {
-            DownloadSource.GLIDE -> GLIDE_URL
-            DownloadSource.PROJECT -> PROJECT_URL
-            DownloadSource.RETROFIT -> RETROFIT_URL
-            else -> null
+    val downloadURL: String?
+        get() {
+            return when (_source) {
+                DownloadSource.GLIDE -> GLIDE_URL
+                DownloadSource.PROJECT -> PROJECT_URL
+                DownloadSource.RETROFIT -> RETROFIT_URL
+                else -> null
+            }
         }
-    }
 
     fun onDownloadSourceSelected(source: DownloadSource?) {
         _selectedSource.value = source
+        _source = source
     }
+
 }

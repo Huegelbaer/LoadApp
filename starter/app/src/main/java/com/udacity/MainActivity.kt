@@ -9,11 +9,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -48,10 +46,6 @@ class MainActivity : AppCompatActivity() {
             val source = mapRadioButtonToSource(checkedId)
             _viewModel.onDownloadSourceSelected(source)
         }
-
-        _viewModel.downloadURL.observe(this, Observer {
-            Toast.makeText(application, it, Toast.LENGTH_LONG).show()
-        })
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -70,8 +64,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun download() {
+        val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
+
         val request =
-            DownloadManager.Request(Uri.parse(URL))
+            DownloadManager.Request(Uri.parse(url))
                 .setTitle(getString(R.string.app_name))
                 .setDescription(getString(R.string.app_description))
                 .setRequiresCharging(false)
@@ -83,9 +79,12 @@ class MainActivity : AppCompatActivity() {
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
     }
 
+    private fun showNoFileSelectedToast() {
+        val text = getText(R.string.no_file_selected_toast)
+        Toast.makeText(application, text, Toast.LENGTH_LONG).show()
+    }
+
     companion object {
-        private const val URL =
-            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
         private const val CHANNEL_ID = "channelId"
     }
 
