@@ -13,28 +13,35 @@
         android:id="@+id/radio_group"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginTop="@dimen/larger_margin"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/larger_margin"
+        app:layout_constraintBottom_toTopOf="@id/custom_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/custom_button">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
             android:id="@+id/radio_button_glide"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/radio_button_glide" />
+            android:text="@string/radio_button_glide"
+            style="@style/radioButton" />
 
         <RadioButton
             android:id="@+id/radio_button_load_app"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/radio_button_load_app" />
+            android:text="@string/radio_button_load_app"
+            style="@style/radioButton" />
 
         <RadioButton
             android:id="@+id/radio_button_retrofit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/radio_button_retrofit" />
+            android:text="@string/radio_button_retrofit"
+            style="@style/radioButton" />
     </RadioGroup>
 
     <com.udacity.LoadingButton
