@@ -1,6 +1,7 @@
 package com.udacity
 
 import android.app.DownloadManager
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        registerDownloadCompletedNotificationChannel()
 
         custom_button.setOnClickListener {
             download()
@@ -82,6 +84,14 @@ class MainActivity : AppCompatActivity() {
     private fun showNoFileSelectedToast() {
         val text = getText(R.string.no_file_selected_toast)
         Toast.makeText(application, text, Toast.LENGTH_LONG).show()
+    }
+
+    private fun registerDownloadCompletedNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(CHANNEL_ID, "Download Completed", NotificationManager.IMPORTANCE_DEFAULT)
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
     }
 
     companion object {
