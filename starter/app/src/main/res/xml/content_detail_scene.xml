@@ -125,13 +125,6 @@
                 app:framePosition="50"
                 app:motionTarget="@id/fileNameTitle" />
 
-            <KeyPosition
-                app:keyPositionType="deltaRelative"
-                app:percentX="1"
-                app:framePosition="75"
-                app:motionTarget="@id/fileNameTitle" />
-
-            <!-- File name value -->
             <KeyAttribute
                 android:alpha="0.0"
                 app:framePosition="25"
