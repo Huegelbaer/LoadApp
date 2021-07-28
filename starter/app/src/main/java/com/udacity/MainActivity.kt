@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var _viewModel: MainViewModel
 
+    private lateinit var downloadManager: DownloadManager
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
@@ -80,10 +81,33 @@ class MainActivity : AppCompatActivity() {
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
 
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
     }
+
+    private fun getDownloadInfo(id: Long): DownloadModel {
+        val cursor = downloadManager.query(
+            DownloadManager.Query().setFilterById(id)
+        )
+
+        val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+        val statusInt = cursor.getInt(statusColumn)
+
+        val nameColumn = cursor.getColumnIndex(DownloadManager.COLUMN_TITLE)
+        val name = cursor.getString(nameColumn)
+
+        cursor.close()
+
+        val status = when (statusInt) {
+            DownloadManager.STATUS_FAILED -> DownloadModel.Status.FAIL
+            DownloadManager.STATUS_SUCCESSFUL -> DownloadModel.Status.SUCCESS
+            else -> DownloadModel.Status.UNKNOWN
+        }
+
+        return DownloadModel(id, name, status)
+    }
+
 
     private fun showNoFileSelectedToast() {
         val text = getText(R.string.no_file_selected_toast)
@@ -100,9 +124,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createDownloadCompletedNotification(id: Long) {
+        val download = getDownloadInfo(id)
+
         val intent = Intent(this, DetailActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra("DownloadID", id)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("Download", download)
         }
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
