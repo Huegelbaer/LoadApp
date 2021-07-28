@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var _viewModel: MainViewModel
 
+    private lateinit var downloadManager: DownloadManager
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
@@ -80,10 +81,41 @@ class MainActivity : AppCompatActivity() {
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
 
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
     }
+
+    private fun getDownloadInfo(id: Long): DownloadModel {
+        if (id < 0) {
+            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+        }
+
+        val cursor = downloadManager.query(
+            DownloadManager.Query().setFilterById(id)
+        ) ?:return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+
+        if (!cursor.moveToFirst()) {
+            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+        }
+
+        val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+        val statusInt = cursor.getInt(statusColumn)
+
+        val nameColumn = cursor.getColumnIndex(DownloadManager.COLUMN_TITLE)
+        val name = cursor.getString(nameColumn)
+
+        cursor.close()
+
+        val status = when (statusInt) {
+            DownloadManager.STATUS_FAILED -> DownloadModel.Status.FAIL
+            DownloadManager.STATUS_SUCCESSFUL -> DownloadModel.Status.SUCCESS
+            else -> DownloadModel.Status.UNKNOWN
+        }
+
+        return DownloadModel(id, name, status)
+    }
+
 
     private fun showNoFileSelectedToast() {
         val text = getText(R.string.no_file_selected_toast)
@@ -100,13 +132,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createDownloadCompletedNotification(id: Long) {
-        val intent = Intent(this, DetailActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra("DownloadID", id)
-        }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        val download = getDownloadInfo(id)
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val intent = Intent(applicationContext, DetailActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("Download", download)
+        }
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_assistant_black_24dp)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_description))

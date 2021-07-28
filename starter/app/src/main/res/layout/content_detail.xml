@@ -8,4 +8,57 @@
     tools:context=".DetailActivity"
     tools:showIn="@layout/activity_detail">
 
+    <TextView
+        android:id="@+id/fileNameTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginTop="@dimen/larger_margin"
+        android:text="@string/file_name_title"
+        android:textColor="@color/propertyTextColor"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/fileNameValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/larger_margin"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:textColor="@color/valueTextColor"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/fileNameTitle"
+        app:layout_constraintTop_toTopOf="@+id/fileNameTitle"
+        tools:text="Glide - Image Loading Library by BumpTech" />
+
+    <TextView
+        android:id="@+id/statusTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginTop="@dimen/larger_margin"
+        android:layout_marginBottom="@dimen/larger_margin"
+        android:text="@string/status_title"
+        android:textColor="@color/propertyTextColor"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fileNameValue"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/statusValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/valueTextColor"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintBottom_toBottomOf="@+id/statusTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/fileNameValue"
+        app:layout_constraintTop_toTopOf="@+id/statusTitle"
+        tools:text="Success" />
 </androidx.constraintlayout.widget.ConstraintLayout>
