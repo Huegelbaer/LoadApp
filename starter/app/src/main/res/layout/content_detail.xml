@@ -44,17 +44,12 @@
         android:text="@string/status_title"
         android:textColor="@color/propertyTextColor"
         android:textSize="@dimen/default_text_size" />
-<!--
+
     <TextView
         android:id="@+id/statusValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/valueTextColor"
         android:textSize="@dimen/default_text_size"
-        app:layout_constraintBottom_toBottomOf="@+id/statusTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/fileNameValue"
-        app:layout_constraintTop_toTopOf="@+id/statusTitle"
-        tools:text="Success" /> -->
+        tools:text="Success" />
 </androidx.constraintlayout.motion.widget.MotionLayout>
