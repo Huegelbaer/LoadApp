@@ -29,21 +29,14 @@
         android:textColor="@color/propertyTextColor"
         android:textSize="@dimen/default_text_size" />
 
-    <!--
     <TextView
         android:id="@+id/fileNameValue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/larger_margin"
-        android:layout_marginEnd="@dimen/default_margin"
         android:textColor="@color/valueTextColor"
         android:textSize="@dimen/default_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/fileNameTitle"
-        app:layout_constraintTop_toTopOf="@+id/fileNameTitle"
         tools:text="Glide - Image Loading Library by BumpTech" />
--->
+
     <TextView
         android:id="@+id/statusTitle"
         android:layout_width="wrap_content"

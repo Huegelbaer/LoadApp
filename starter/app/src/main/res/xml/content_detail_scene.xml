@@ -9,6 +9,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="0dp"
             android:layout_marginTop="@dimen/larger_margin"
+            app:layout_constraintStart_toEndOf="@id/fileNameTitle"
+            app:layout_constraintTop_toTopOf="@id/fileNameTitle">
+            <PropertySet android:alpha="0.0" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/fileNameValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="@dimen/larger_margin"
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
             <PropertySet android:alpha="0.0" />
@@ -20,7 +30,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="@dimen/larger_margin"
             app:layout_constraintStart_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fileNameTitle">
+            app:layout_constraintTop_toBottomOf="@id/fileNameValue">
             <PropertySet android:alpha="0.0" />
         </Constraint>
     </ConstraintSet>
@@ -37,12 +47,25 @@
             <PropertySet android:alpha="1.0" />
         </Constraint>
         <Constraint
+            android:id="@+id/fileNameValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/larger_margin"
+            android:layout_marginEnd="@dimen/default_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/fileNameTitle"
+            app:layout_constraintBottom_toBottomOf="@id/fileNameTitle"
+            app:layout_constraintTop_toTopOf="@id/fileNameTitle">
+            <PropertySet android:alpha="0.0" />
+        </Constraint>
+        <Constraint
             android:id="@id/statusTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/larger_margin"
-            app:layout_constraintStart_toStartOf="@+id/fileNameTitle"
-            app:layout_constraintTop_toBottomOf="@+id/fileNameTitle">
+            app:layout_constraintStart_toStartOf="@id/fileNameTitle"
+            app:layout_constraintTop_toBottomOf="@id/fileNameValue">
             <PropertySet android:alpha="1.0" />
         </Constraint>
     </ConstraintSet>
@@ -68,6 +91,25 @@
                 app:framePosition="50"
                 app:motionTarget="@id/fileNameTitle" />
 
+            <!-- File name value -->
+            <KeyAttribute
+                android:alpha="0.0"
+                app:framePosition="25"
+                app:motionTarget="@id/fileNameValue" />
+
+            <KeyPosition
+                app:keyPositionType="deltaRelative"
+                app:percentX="0"
+                app:framePosition="25"
+                app:motionTarget="@id/fileNameValue" />
+
+            <KeyAttribute
+                android:alpha="1.0"
+                app:framePosition="55"
+                app:motionTarget="@id/fileNameValue" />
+
+
+            <!-- Status Title -->
 
             <KeyAttribute
                 android:alpha="0.0"

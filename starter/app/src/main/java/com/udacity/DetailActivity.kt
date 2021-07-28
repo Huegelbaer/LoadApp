@@ -18,8 +18,8 @@ class DetailActivity : AppCompatActivity() {
 
     private fun handleDownloadIntent(intent: Intent) {
         intent.extras?.getParcelable<DownloadModel>("Download")?.let { download ->
-            /*fileNameValue.text = download.name
-            statusValue.text = when(download.status) {
+            fileNameValue.text = download.name
+            /*statusValue.text = when(download.status) {
                 DownloadModel.Status.SUCCESS -> "SUCCESS"
                 DownloadModel.Status.FAIL -> "FAIL"
                 DownloadModel.Status.UNKNOWN -> "UNKNOWN"
