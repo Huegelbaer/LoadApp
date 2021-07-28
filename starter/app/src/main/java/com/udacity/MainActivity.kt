@@ -87,9 +87,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getDownloadInfo(id: Long): DownloadModel {
+        if (id < 0) {
+            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+        }
+
         val cursor = downloadManager.query(
             DownloadManager.Query().setFilterById(id)
-        )
+        ) ?:return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+
+        if (!cursor.moveToFirst()) {
+            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+        }
 
         val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
         val statusInt = cursor.getInt(statusColumn)
