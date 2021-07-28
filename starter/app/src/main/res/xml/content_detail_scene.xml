@@ -1,52 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<MotionScene
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <ConstraintSet android:id="@+id/start">
-      <Constraint android:id="@+id/fileNameValue">
-          <PropertySet android:alpha="0.0" />
-      </Constraint>
-      <Constraint android:id="@+id/statusValue">
-          <PropertySet android:alpha="0.0" />
-      </Constraint>
-  </ConstraintSet>
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@+id/fileNameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="@dimen/larger_margin"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <PropertySet android:alpha="0.0" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/statusTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="@dimen/larger_margin"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fileNameTitle">
+            <PropertySet android:alpha="0.0" />
+        </Constraint>
+    </ConstraintSet>
 
-  <ConstraintSet android:id="@+id/end">
-      <Constraint android:id="@id/fileNameValue">
-          <PropertySet android:alpha="1.0" />
-      </Constraint>
-      <Constraint android:id="@id/statusValue">
-          <PropertySet android:alpha="1.0" />
-      </Constraint>
-  </ConstraintSet>
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@id/fileNameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/default_margin"
+            android:layout_marginTop="@dimen/larger_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <PropertySet android:alpha="1.0" />
+        </Constraint>
+        <Constraint
+            android:id="@id/statusTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/larger_margin"
+            app:layout_constraintStart_toStartOf="@+id/fileNameTitle"
+            app:layout_constraintTop_toBottomOf="@+id/fileNameTitle">
+            <PropertySet android:alpha="1.0" />
+        </Constraint>
+    </ConstraintSet>
 
-  <Transition
-      app:constraintSetStart="@+id/start"
-      app:constraintSetEnd="@id/end"
-      app:duration="3000" >
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start"
+        app:duration="3000">
 
-      <OnClick app:clickAction="toggle" app:targetId="@id/background" />
+        <OnClick
+            app:clickAction="toggle"
+            app:targetId="@id/background" />
 
-      <KeyFrameSet>
-          <KeyAttribute
-              app:framePosition="15"
-              app:motionTarget="@id/fileNameValue"
-              android:alpha="0.0"
-              />
-          <KeyAttribute
-              app:framePosition="50"
-              app:motionTarget="@id/fileNameValue"
-              android:alpha="1.0"
-              />
+        <KeyFrameSet>
+            <KeyAttribute
+                android:alpha="1.0"
+                app:framePosition="50"
+                app:motionTarget="@id/fileNameTitle" />
 
-          <KeyAttribute
-              app:framePosition="40"
-              app:motionTarget="@id/statusValue"
-              android:alpha="0.0"
-              />
+            <KeyPosition
+                app:keyPositionType="deltaRelative"
+                app:percentX="1"
+                app:framePosition="50"
+                app:motionTarget="@id/fileNameTitle" />
 
-      </KeyFrameSet>
-  </Transition>
+
+            <KeyAttribute
+                android:alpha="0.0"
+                app:framePosition="40"
+                app:motionTarget="@id/statusTitle" />
+
+            <KeyPosition
+                app:percentX="0"
+                app:framePosition="50"
+                app:motionTarget="@id/statusTitle" />
+
+        </KeyFrameSet>
+    </Transition>
 
 </MotionScene>
