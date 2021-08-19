@@ -28,6 +28,19 @@ class MainViewModel(): ViewModel() {
         source == DownloadSource.CUSTOM_URL
     }
 
+    private var _enteredCustomURL = MutableLiveData<String>()
+
+    val isSourceValid = MediatorLiveData<Boolean>()
+
+    init {
+        isSourceValid.addSource(_selectedSource) {
+            updateIsSourceValid(it, _customURL)
+        }
+        isSourceValid.addSource(_enteredCustomURL) { url ->
+            updateIsSourceValid(_source, url)
+        }
+    }
+
     val downloadURL: String?
         get() {
             return when (_source) {
@@ -49,4 +62,21 @@ class MainViewModel(): ViewModel() {
         _enteredCustomURL.value = url
     }
 
+    fun isDownloadUrlValid(): Boolean {
+        return isSourceValid(_source, _customURL)
+    }
+
+    private fun updateIsSourceValid(source: DownloadSource?, url: String?) {
+        isSourceValid.value = isSourceValid(source, url)
+    }
+
+    private fun isSourceValid(source: DownloadSource?, url: String?): Boolean {
+        return when (source) {
+            DownloadSource.GLIDE -> true
+            DownloadSource.PROJECT -> true
+            DownloadSource.RETROFIT -> true
+            DownloadSource.CUSTOM_URL -> URLUtil.isValidUrl(url)
+            else -> false
+        }
+    }
 }

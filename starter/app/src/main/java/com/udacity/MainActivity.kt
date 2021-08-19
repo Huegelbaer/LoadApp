@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun download() {
         val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
+        if (!_viewModel.isDownloadUrlValid()) return showInvalidURLToast()
 
         val request =
             DownloadManager.Request(Uri.parse(url))
@@ -138,6 +139,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showNoFileSelectedToast() {
         val text = getText(R.string.no_file_selected_toast)
+        Toast.makeText(application, text, Toast.LENGTH_LONG).show()
+    }
+
+    private fun showInvalidURLToast() {
+        val text = getText(R.string.url_invalid_toast)
         Toast.makeText(application, text, Toast.LENGTH_LONG).show()
     }
 

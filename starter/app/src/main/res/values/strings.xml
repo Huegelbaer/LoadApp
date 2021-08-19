@@ -17,6 +17,7 @@
     <string name="radio_button_custom_url">URL</string>
 
     <string name="no_file_selected_toast">Please select the file to download</string>
+    <string name="url_invalid_toast">Please enter a valid url</string>
     <string name="file_name_title">File name:</string>
     <string name="status_title">Status:</string>
 </resources>
