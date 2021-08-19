@@ -11,9 +11,12 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -50,6 +53,21 @@ class MainActivity : AppCompatActivity() {
             val source = mapRadioButtonToSource(checkedId)
             _viewModel.onDownloadSourceSelected(source)
         }
+
+        _viewModel.shouldShowURLInput.observe(this, Observer {
+            it?.let {
+                if (it) {
+                    edit_custom_url.visibility = View.VISIBLE
+                    edit_custom_url.requestFocus()
+                } else {
+                    edit_custom_url.visibility = View.GONE
+                }
+            }
+        })
+
+        edit_custom_url.addTextChangedListener {
+            _viewModel.onCustomUrlEntered(it.toString())
+        }
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -66,6 +84,7 @@ class MainActivity : AppCompatActivity() {
             R.id.radio_button_glide -> MainViewModel.DownloadSource.GLIDE
             R.id.radio_button_load_app -> MainViewModel.DownloadSource.PROJECT
             R.id.radio_button_retrofit -> MainViewModel.DownloadSource.RETROFIT
+            R.id.radio_button_custom_url -> MainViewModel.DownloadSource.CUSTOM_URL
             else -> null
         }
     }

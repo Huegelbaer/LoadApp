@@ -1,14 +1,12 @@
 package com.udacity
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.webkit.URLUtil
+import androidx.lifecycle.*
 
 class MainViewModel(): ViewModel() {
 
     enum class DownloadSource {
-        GLIDE, PROJECT, RETROFIT
+        GLIDE, PROJECT, RETROFIT, CUSTOM_URL
     }
 
     private companion object {
@@ -20,10 +18,15 @@ class MainViewModel(): ViewModel() {
 
 
     private var _source: DownloadSource? = null
+    private var _customURL: String? = null
 
     private var _selectedSource = MutableLiveData<DownloadSource>()
     val selectedSource: LiveData<DownloadSource>
         get() = _selectedSource
+
+    val shouldShowURLInput: LiveData<Boolean> = Transformations.map(_selectedSource) { source ->
+        source == DownloadSource.CUSTOM_URL
+    }
 
     val downloadURL: String?
         get() {
@@ -31,13 +34,19 @@ class MainViewModel(): ViewModel() {
                 DownloadSource.GLIDE -> GLIDE_URL
                 DownloadSource.PROJECT -> PROJECT_URL
                 DownloadSource.RETROFIT -> RETROFIT_URL
+                DownloadSource.CUSTOM_URL -> _customURL
                 else -> null
             }
         }
 
     fun onDownloadSourceSelected(source: DownloadSource?) {
-        _selectedSource.value = source
         _source = source
+        _selectedSource.value = source
+    }
+
+    fun onCustomUrlEntered(url: String) {
+        _customURL = url
+        _enteredCustomURL.value = url
     }
 
 }
