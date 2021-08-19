@@ -84,6 +84,43 @@ class MainActivity : AppCompatActivity() {
         downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
+
+        createDownloadingNotification(downloadID)
+
+
+        // using query method
+        var finishDownload = false
+        var progress: Int
+        loop@ while (!finishDownload) {
+            var cursor = downloadManager.query(DownloadManager.Query().setFilterById(downloadID));
+            if (cursor.moveToFirst()) {
+                var status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                when (status) {
+                    DownloadManager.STATUS_FAILED -> {
+                        finishDownload = true
+                    }
+                    DownloadManager.STATUS_PAUSED -> break@loop
+                    DownloadManager.STATUS_PENDING -> break@loop
+                    DownloadManager.STATUS_RUNNING -> {
+                        var total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                        if (total >= 0) {
+                            var downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                            progress = ((downloaded * 100L) / total).toInt()
+                            // if you use downloadmanger in async task, here you can use like this to display progress.
+                            // Don't forget to do the division in long to get more digits rather than double.
+                            //  publishProgress((int) ((downloaded * 100L) / total));
+                            createDownloadingNotification(downloadID, progress)
+                        }
+                    }
+                    DownloadManager.STATUS_SUCCESSFUL -> {
+                        progress = 100
+                        // if you use aysnc task
+                        // publishProgress(100);
+                        finishDownload = true
+                    }
+                }
+            }
+        }
     }
 
     private fun getDownloadInfo(id: Long): DownloadModel {
@@ -131,6 +168,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun createDownloadingNotification(id: Long, progress: Int = 0) {
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_assistant_black_24dp)
+            .setContentTitle(getString(R.string.notification_title))
+            .setContentText(getString(R.string.notification_download_running_description))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setProgress(100, progress, false)
+            .build()
+
+        notificationManager.notify(id.toInt(), notification)
+    }
+
     private fun createDownloadCompletedNotification(id: Long) {
         val download = getDownloadInfo(id)
 
@@ -143,14 +192,15 @@ class MainActivity : AppCompatActivity() {
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_assistant_black_24dp)
             .setContentTitle(getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_description))
+            .setContentText(getString(R.string.notification_download_complete_description))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_assistant_black_24dp, getString(R.string.notification_button), pendingIntent)
             .setAutoCancel(true)
+            .setProgress(100, 100, false)
             .build()
 
-        notificationManager.notify(0, notification)
+        notificationManager.notify(id.toInt(), notification)
     }
 
     companion object {
