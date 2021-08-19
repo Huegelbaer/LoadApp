@@ -11,6 +11,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -107,39 +108,39 @@ class MainActivity : AppCompatActivity() {
 
         createDownloadingNotification(downloadID)
 
-
         // using query method
         var finishDownload = false
-        var progress: Int
+        var progress: Double
         loop@ while (!finishDownload) {
-            var cursor = downloadManager.query(DownloadManager.Query().setFilterById(downloadID));
+            val cursor = downloadManager.query(DownloadManager.Query().setFilterById(downloadID));
             if (cursor.moveToFirst()) {
-                var status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                Log.i("Download Info", "status: $status")
                 when (status) {
                     DownloadManager.STATUS_FAILED -> {
                         finishDownload = true
                     }
-                    DownloadManager.STATUS_PAUSED -> break@loop
-                    DownloadManager.STATUS_PENDING -> break@loop
+                //    DownloadManager.STATUS_PAUSED -> continue@loop
+                //    DownloadManager.STATUS_PENDING -> continue@loop
                     DownloadManager.STATUS_RUNNING -> {
-                        var total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                        val total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
                         if (total >= 0) {
-                            var downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                            progress = ((downloaded * 100L) / total).toInt()
-                            // if you use downloadmanger in async task, here you can use like this to display progress.
-                            // Don't forget to do the division in long to get more digits rather than double.
-                            //  publishProgress((int) ((downloaded * 100L) / total));
-                            createDownloadingNotification(downloadID, progress)
+                            val downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                            progress = downloaded.toDouble()/ total.toDouble() * 100L
+                            Log.i("Download Info", "total: $total, downloaded: $downloaded, progress: $progress")
+                            createDownloadingNotification(downloadID, progress.toInt())
                         }
                     }
                     DownloadManager.STATUS_SUCCESSFUL -> {
-                        progress = 100
+                        progress = 100.0
                         // if you use aysnc task
                         // publishProgress(100);
+                        createDownloadingNotification(downloadID, 100)
                         finishDownload = true
                     }
                 }
             }
+            cursor.close()
         }
     }
 
@@ -199,7 +200,7 @@ class MainActivity : AppCompatActivity() {
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_download_running_description))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setProgress(100, progress, false)
+            .setProgress(100, progress, true)
             .build()
 
         notificationManager.notify(id.toInt(), notification)
@@ -222,7 +223,6 @@ class MainActivity : AppCompatActivity() {
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_assistant_black_24dp, getString(R.string.notification_button), pendingIntent)
             .setAutoCancel(true)
-            .setProgress(100, 100, false)
             .build()
 
         notificationManager.notify(id.toInt(), notification)
