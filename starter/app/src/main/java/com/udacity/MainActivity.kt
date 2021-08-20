@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                         createDownloadingNotification(downloadID, it.progress ?: 0)
                     }
                     DownloadUtils.Status.FAILED -> {
-                        createDownloadCompletedNotification(downloadID)
+                        createDownloadFailedNotification(downloadID)
                     }
                     DownloadUtils.Status.SUCCESS -> {
                         createDownloadCompletedNotification(downloadID)
@@ -150,6 +150,19 @@ class MainActivity : AppCompatActivity() {
             download,
             getString(R.string.notification_title),
             getString(R.string.notification_download_complete_description),
+            getString(R.string.notification_button)
+        )
+    }
+
+    private fun createDownloadFailedNotification(id: Long) {
+        val download = downloadUtils.getInfo(id)
+
+        notificationUtils.createDownloadFailedNotification(
+            id.toInt(),
+            download,
+            getString(R.string.notification_title),
+            getString(R.string.notification_download_failed_description),
+            getString(R.string.notification_retry_button),
             getString(R.string.notification_button)
         )
     }
