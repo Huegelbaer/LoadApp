@@ -26,8 +26,6 @@ class MainActivity : AppCompatActivity() {
 
     private val scope = CoroutineScope(Job() + Dispatchers.Default)
 
-    private var downloadID: Long = 0
-
     private lateinit var _viewModel: MainViewModel
 
     private lateinit var downloadUtils: DownloadUtils
@@ -100,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
         if (!_viewModel.isDownloadUrlValid()) return showInvalidURLToast()
 
-        downloadID = downloadUtils.startDownload(
+        val downloadID = downloadUtils.startDownload(
             Uri.parse(url),
             getString(R.string.app_name),
             getString(R.string.app_description)
