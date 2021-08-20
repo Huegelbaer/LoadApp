@@ -11,7 +11,6 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,17 +18,22 @@ import androidx.core.app.NotificationCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.udacity.utils.DownloadUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
 
 class MainActivity : AppCompatActivity() {
+
+    private val scope = CoroutineScope(Job() + Dispatchers.Default)
 
     private var downloadID: Long = 0
 
     private lateinit var _viewModel: MainViewModel
 
-    private lateinit var downloadManager: DownloadManager
+    private lateinit var downloadUtils: DownloadUtils
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
@@ -47,7 +51,9 @@ class MainActivity : AppCompatActivity() {
         registerDownloadCompletedNotificationChannel()
 
         custom_button.setOnClickListener {
-            download()
+            scope.launch {
+                download()
+            }
         }
 
         radio_group.setOnCheckedChangeListener { _, checkedId ->
@@ -69,6 +75,9 @@ class MainActivity : AppCompatActivity() {
         edit_custom_url.addTextChangedListener {
             _viewModel.onCustomUrlEntered(it.toString())
         }
+
+        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+        downloadUtils = DownloadUtils(downloadManager)
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -90,90 +99,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun download() {
+    private suspend fun download() {
         val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
         if (!_viewModel.isDownloadUrlValid()) return showInvalidURLToast()
 
-        val request =
-            DownloadManager.Request(Uri.parse(url))
-                .setTitle(getString(R.string.app_name))
-                .setDescription(getString(R.string.app_description))
-                .setRequiresCharging(false)
-                .setAllowedOverMetered(true)
-                .setAllowedOverRoaming(true)
-
-        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        downloadID =
-            downloadManager.enqueue(request)// enqueue puts the download request in the queue.
-
+        downloadID = downloadUtils.startDownload(
+            Uri.parse(url),
+            getString(R.string.app_name),
+            getString(R.string.app_description)
+        )
         createDownloadingNotification(downloadID)
 
-        // using query method
-        var finishDownload = false
-        var progress: Double
-        loop@ while (!finishDownload) {
-            val cursor = downloadManager.query(DownloadManager.Query().setFilterById(downloadID));
-            if (cursor.moveToFirst()) {
-                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                Log.i("Download Info", "status: $status")
-                when (status) {
-                    DownloadManager.STATUS_FAILED -> {
-                        finishDownload = true
+        downloadUtils.observeDownload(downloadID).collect {
+            withContext(Dispatchers.Main) {
+                when (it.status) {
+                    DownloadUtils.Status.RUNNING -> {
+                        createDownloadingNotification(downloadID, it.progress ?: 0)
                     }
-                //    DownloadManager.STATUS_PAUSED -> continue@loop
-                //    DownloadManager.STATUS_PENDING -> continue@loop
-                    DownloadManager.STATUS_RUNNING -> {
-                        val total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                        if (total >= 0) {
-                            val downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                            progress = downloaded.toDouble()/ total.toDouble() * 100L
-                            Log.i("Download Info", "total: $total, downloaded: $downloaded, progress: $progress")
-                            createDownloadingNotification(downloadID, progress.toInt())
-                        }
+                    DownloadUtils.Status.FAILED -> {
+                        createDownloadCompletedNotification(downloadID)
                     }
-                    DownloadManager.STATUS_SUCCESSFUL -> {
-                        progress = 100.0
-                        // if you use aysnc task
-                        // publishProgress(100);
-                        createDownloadingNotification(downloadID, 100)
-                        finishDownload = true
+                    DownloadUtils.Status.SUCCESS -> {
+                        createDownloadCompletedNotification(downloadID)
                     }
+                    else -> { }
                 }
             }
-            cursor.close()
         }
     }
-
-    private fun getDownloadInfo(id: Long): DownloadModel {
-        if (id < 0) {
-            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
-        }
-
-        val cursor = downloadManager.query(
-            DownloadManager.Query().setFilterById(id)
-        ) ?:return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
-
-        if (!cursor.moveToFirst()) {
-            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
-        }
-
-        val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-        val statusInt = cursor.getInt(statusColumn)
-
-        val nameColumn = cursor.getColumnIndex(DownloadManager.COLUMN_TITLE)
-        val name = cursor.getString(nameColumn)
-
-        cursor.close()
-
-        val status = when (statusInt) {
-            DownloadManager.STATUS_FAILED -> DownloadModel.Status.FAIL
-            DownloadManager.STATUS_SUCCESSFUL -> DownloadModel.Status.SUCCESS
-            else -> DownloadModel.Status.UNKNOWN
-        }
-
-        return DownloadModel(id, name, status)
-    }
-
 
     private fun showNoFileSelectedToast() {
         val text = getText(R.string.no_file_selected_toast)
@@ -207,7 +160,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createDownloadCompletedNotification(id: Long) {
-        val download = getDownloadInfo(id)
+        val download = downloadUtils.getInfo(id)
 
         val intent = Intent(applicationContext, DetailActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
