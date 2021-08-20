@@ -11,7 +11,10 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
+import android.webkit.MimeTypeMap
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -92,10 +95,14 @@ class MainActivity : AppCompatActivity() {
     private fun download() {
         val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
         if (!_viewModel.isDownloadUrlValid()) return showInvalidURLToast()
-
+        val fileName =  URLUtil.guessFileName(
+            url,
+            null,
+            MimeTypeMap.getFileExtensionFromUrl(url)
+        )
         val request =
             DownloadManager.Request(Uri.parse(url))
-                .setTitle(getString(R.string.app_name))
+                .setTitle(fileName)
                 .setDescription(getString(R.string.app_description))
                 .setRequiresCharging(false)
                 .setAllowedOverMetered(true)
