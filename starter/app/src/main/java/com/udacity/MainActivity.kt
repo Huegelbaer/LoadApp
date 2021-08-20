@@ -4,10 +4,7 @@ import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -115,15 +112,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun getDownloadInfo(id: Long): DownloadModel {
         if (id < 0) {
-            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL, null)
         }
 
         val cursor = downloadManager.query(
             DownloadManager.Query().setFilterById(id)
-        ) ?:return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+        ) ?:return DownloadModel(id, "Nix", DownloadModel.Status.FAIL, null)
 
         if (!cursor.moveToFirst()) {
-            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL)
+            return DownloadModel(id, "Nix", DownloadModel.Status.FAIL, null)
         }
 
         val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
@@ -131,6 +128,9 @@ class MainActivity : AppCompatActivity() {
 
         val nameColumn = cursor.getColumnIndex(DownloadManager.COLUMN_TITLE)
         val name = cursor.getString(nameColumn)
+
+        val localUriColumn = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+        val localUri = cursor.getString(localUriColumn)
 
         cursor.close()
 
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
             else -> DownloadModel.Status.UNKNOWN
         }
 
-        return DownloadModel(id, name, status)
+        return DownloadModel(id, name, status, localUri)
     }
 
 
