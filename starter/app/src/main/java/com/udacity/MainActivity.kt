@@ -1,24 +1,21 @@
 package com.udacity
 
 import android.app.DownloadManager
-import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.udacity.utils.DownloadUtils
+import com.udacity.utils.NotificationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
@@ -34,9 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var _viewModel: MainViewModel
 
     private lateinit var downloadUtils: DownloadUtils
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
+    private lateinit var notificationUtils: NotificationUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-        registerDownloadCompletedNotificationChannel()
 
         custom_button.setOnClickListener {
             scope.launch {
@@ -78,6 +72,9 @@ class MainActivity : AppCompatActivity() {
 
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadUtils = DownloadUtils(downloadManager)
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationUtils = NotificationUtils(notificationManager, applicationContext)
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -138,51 +135,24 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(application, text, Toast.LENGTH_LONG).show()
     }
 
-    private fun registerDownloadCompletedNotificationChannel() {
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Download Completed", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
     private fun createDownloadingNotification(id: Long, progress: Int = 0) {
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_assistant_black_24dp)
-            .setContentTitle(getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_download_running_description))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setProgress(100, progress, true)
-            .build()
-
-        notificationManager.notify(id.toInt(), notification)
+        notificationUtils.createDownloadingNotification(
+            id.toInt(),
+            getString(R.string.notification_title),
+            getString(R.string.notification_download_complete_description),
+            progress
+        )
     }
 
     private fun createDownloadCompletedNotification(id: Long) {
         val download = downloadUtils.getInfo(id)
 
-        val intent = Intent(applicationContext, DetailActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("Download", download)
-        }
-        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_assistant_black_24dp)
-            .setContentTitle(getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_download_complete_description))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_assistant_black_24dp, getString(R.string.notification_button), pendingIntent)
-            .setAutoCancel(true)
-            .build()
-
-        notificationManager.notify(id.toInt(), notification)
+        notificationUtils.createDownloadCompletedNotification(
+            id.toInt(),
+            download,
+            getString(R.string.notification_title),
+            getString(R.string.notification_download_complete_description),
+            getString(R.string.notification_button)
+        )
     }
-
-    companion object {
-        private const val CHANNEL_ID = "channelId"
-    }
-
 }
