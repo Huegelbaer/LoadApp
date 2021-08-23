@@ -1,7 +1,6 @@
 package com.udacity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -24,7 +23,11 @@ class DetailActivity : AppCompatActivity() {
             downloadModel?.let {
                 if (it.status == DownloadModel.Status.SUCCESS) {
                     val file = File(it.fileUrl!!)
-                    val uri = Uri.fromFile(file)
+
+                    val uri = FileProvider.getUriForFile(
+                        applicationContext,
+                        "${BuildConfig.APPLICATION_ID}.fileProvider",
+                        file)
                     val intent = Intent(Intent.ACTION_VIEW)
                         .setData(uri)
                         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
