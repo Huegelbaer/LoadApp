@@ -23,9 +23,10 @@ class DetailActivity : AppCompatActivity() {
         openFileButton.setOnClickListener {
             downloadModel?.let {
                 if (it.status == DownloadModel.Status.SUCCESS) {
-
+                    val file = File(it.fileUrl!!)
+                    val uri = Uri.fromFile(file)
                     val intent = Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(it.fileUrl))
+                        .setData(uri)
                         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     startActivity(intent)
