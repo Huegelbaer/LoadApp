@@ -20,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -97,10 +98,19 @@ class MainActivity : AppCompatActivity() {
             null,
             MimeTypeMap.getFileExtensionFromUrl(url)
         )
+
+        val direct = File(getExternalFilesDir(null), "/repos/${_viewModel.sourceName}")
+        if (!direct.exists()) {
+            direct.mkdirs()
+        }
+
         val request =
             DownloadManager.Request(Uri.parse(url))
                 .setTitle(fileName)
                 .setDescription(getString(R.string.app_description))
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                    "$direct/$fileName"
+                )
                 .setRequiresCharging(false)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)

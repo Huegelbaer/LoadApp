@@ -16,8 +16,10 @@ class MainViewModel(): ViewModel() {
         private const val RETROFIT_URL = "https://github.com/square/retrofit/archive/master.zip"
     }
 
-
     private var _source: DownloadSource? = null
+    val sourceName: String?
+        get() = _source?.name
+
     private var _customURL: String? = null
 
     private var _selectedSource = MutableLiveData<DownloadSource>()

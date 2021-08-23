@@ -24,6 +24,11 @@ class DetailActivity : AppCompatActivity() {
             downloadModel?.let {
                 if (it.status == DownloadModel.Status.SUCCESS) {
 
+                    val intent = Intent(Intent.ACTION_VIEW)
+                        .setData(Uri.parse(it.fileUrl))
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                    startActivity(intent)
                 }
             }
         }
