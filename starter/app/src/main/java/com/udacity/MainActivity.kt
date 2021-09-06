@@ -95,8 +95,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun download() {
-        val url = _viewModel.downloadURL ?: return showNoFileSelectedToast()
-        if (!_viewModel.isDownloadUrlValid()) return showInvalidURLToast()
+        val url = _viewModel.downloadURL ?: return withContext(Dispatchers.Main) {
+            showNoFileSelectedToast()
+        }
+
+        if (!_viewModel.isDownloadUrlValid()) return withContext(Dispatchers.Main) {
+            showInvalidURLToast()
+        }
 
         val downloadID = downloadUtils.startDownload(
             Uri.parse(url),
