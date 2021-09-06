@@ -2,15 +2,9 @@ package com.udacity
 
 import android.app.DownloadManager
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.app.PendingIntent
-import android.content.*
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
