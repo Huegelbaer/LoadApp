@@ -73,6 +73,17 @@ class MainActivity : AppCompatActivity() {
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationUtils = NotificationUtils(notificationManager, applicationContext)
+
+        handleRetryIntent(intent)
+    }
+
+    private fun handleRetryIntent(intent: Intent) {
+        intent.extras?.getString(NotificationUtils.DOWNLOAD_URL_KEY)?.let { url ->
+            _viewModel.prepareRetryDownload(url)
+            scope.launch {
+                download()
+            }
+        }
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -117,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                         createDownloadingNotification(downloadID, it.progress ?: 0)
                     }
                     DownloadUtils.Status.FAILED -> {
-                        createDownloadFailedNotification(downloadID)
+                        createDownloadFailedNotification(downloadID, url)
                     }
                     DownloadUtils.Status.SUCCESS -> {
                         createDownloadCompletedNotification(downloadID)
@@ -159,16 +170,17 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun createDownloadFailedNotification(id: Long) {
-        val download = downloadUtils.getInfo(id)
+    private fun createDownloadFailedNotification(id: Long, url: String) {
+        val download = downloadUtils.getInfo(id, url)
 
         notificationUtils.createDownloadFailedNotification(
             id.toInt(),
             download,
+            url,
             getString(R.string.notification_title),
             getString(R.string.notification_download_failed_description),
             getString(R.string.notification_retry_button),
-            getString(R.string.notification_button)
+            getString(R.string.notification_button_failed)
         )
     }
 }

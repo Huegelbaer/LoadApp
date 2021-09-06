@@ -9,6 +9,7 @@
     <string name="notification_download_failed_description">Download of The Project 3 repository failed</string>
     <string name="notification_download_running_description">downloading…</string>
     <string name="notification_button">See changes</string>
+    <string name="notification_button_failed">See information</string>
     <string name="notification_retry_button">Retry</string>
 
     <string name="button_name">Click me</string>

@@ -17,6 +17,7 @@ class NotificationUtils(
     companion object {
         private const val CHANNEL_ID = "downloadInformation"
         const val SHOW_DOWNLOAD_KEY = "download"
+        const val DOWNLOAD_URL_KEY = "url"
     }
 
     init {
@@ -78,13 +79,14 @@ class NotificationUtils(
     fun createDownloadFailedNotification(
         id: Int,
         downloadModel: DownloadModel,
+        url: String,
         title: String,
         content: String,
         retryActionTitle: String,
         showActionTitle: String
     ) {
 
-        val retryPendingIntent = createRetryIntent()
+        val retryPendingIntent = createRetryIntent(url)
         val showPendingIntent = createShowIntent(downloadModel)
 
         val notification = createBaseNotificationBuilder(title, content)
@@ -116,9 +118,10 @@ class NotificationUtils(
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    private fun createRetryIntent(): PendingIntent {
+    private fun createRetryIntent(url: String): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(DOWNLOAD_URL_KEY, url)
         }
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
