@@ -1,10 +1,12 @@
 package com.udacity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
-import com.udacity.utils.NotificationUtils
 import androidx.core.content.FileProvider
+import com.udacity.utils.NotificationUtils
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 import java.io.File
@@ -21,19 +23,31 @@ class DetailActivity : AppCompatActivity() {
         handleDownloadIntent(intent)
 
         openFileButton.setOnClickListener {
-            downloadModel?.let {
+            downloadModel?.let { it ->
                 if (it.status == DownloadModel.Status.SUCCESS) {
-                    val file = File(it.fileUrl!!)
+                    it.fileUrl?.let { fileUrl ->
+                        val url = fileUrl.removePrefix("file://")
+                        val file = File(url)
+                        val uri = FileProvider.getUriForFile(
+                            applicationContext,
+                            "${BuildConfig.APPLICATION_ID}.fileProvider",
+                            file)
 
-                    val uri = FileProvider.getUriForFile(
-                        applicationContext,
-                        "${BuildConfig.APPLICATION_ID}.fileProvider",
-                        file)
-                    val intent = Intent(Intent.ACTION_VIEW)
-                        .setData(uri)
-                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        val intent = Intent(Intent.ACTION_VIEW)
+                            .setData(uri)
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-                    startActivity(intent)
+                        try {
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            val lastSegment = uri.lastPathSegment
+                            val newUrl = url.removeSuffix(lastSegment!!)
+                            val selectedUri = Uri.parse(newUrl)
+                            val newIntent = Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(selectedUri, "resource/folder")
+                            startActivity(newIntent)
+                        }
+                    }
                 }
             }
         }
