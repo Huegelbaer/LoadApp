@@ -40,8 +40,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-
         custom_button.setOnClickListener {
             scope.launch {
                 download()
@@ -82,15 +80,6 @@ class MainActivity : AppCompatActivity() {
             _viewModel.prepareRetryDownload(url)
             scope.launch {
                 download()
-            }
-        }
-    }
-
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            id?.let {
-                createDownloadCompletedNotification(it)
             }
         }
     }
