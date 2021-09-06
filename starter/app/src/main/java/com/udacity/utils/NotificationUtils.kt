@@ -44,6 +44,7 @@ class NotificationUtils(
 
         val notification = createBaseNotificationBuilder(title, content)
             .setProgress(100, progress, true)
+            .setOnlyAlertOnce(true)
             .build()
 
         notificationManager.notify(id, notification)
@@ -68,6 +69,7 @@ class NotificationUtils(
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_assistant_black_24dp, actionTitle, pendingIntent)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(false)
             .build()
 
         notificationManager.notify(id, notification)
@@ -89,6 +91,7 @@ class NotificationUtils(
             .addAction(R.drawable.ic_assistant_black_24dp, retryActionTitle, retryPendingIntent)
             .addAction(R.drawable.ic_assistant_black_24dp, showActionTitle, showPendingIntent)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(false)
             .build()
 
         notificationManager.notify(id, notification)
