@@ -81,4 +81,9 @@ class MainViewModel(): ViewModel() {
             else -> false
         }
     }
+
+    fun prepareRetryDownload(url: String) {
+        _source = DownloadSource.CUSTOM_URL
+        _customURL = url
+    }
 }

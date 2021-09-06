@@ -3,7 +3,7 @@ package com.udacity
 import android.os.Parcel
 import android.os.Parcelable
 
-class DownloadModel(val id: Long, val name: String, val status: Status, val fileUrl: String?): Parcelable {
+class DownloadModel(val id: Long, val name: String?, val status: Status, val url: String?, val fileUrl: String?): Parcelable {
 
     enum class Status {
         SUCCESS, FAIL, UNKNOWN
@@ -11,8 +11,9 @@ class DownloadModel(val id: Long, val name: String, val status: Status, val file
 
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
-        parcel.readString()!!,
+        parcel.readString(),
         Status.values()[parcel.readInt()],
+        parcel.readString(),
         parcel.readString()
     )
 
@@ -20,6 +21,7 @@ class DownloadModel(val id: Long, val name: String, val status: Status, val file
         parcel.writeLong(id)
         parcel.writeString(name)
         parcel.writeInt(status.ordinal)
+        parcel.writeString(url)
         parcel.writeString(fileUrl)
     }
 
