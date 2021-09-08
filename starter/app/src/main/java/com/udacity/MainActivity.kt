@@ -108,16 +108,11 @@ class MainActivity : AppCompatActivity() {
             MimeTypeMap.getFileExtensionFromUrl(url)
         )
 
-        val direct = File(getExternalFilesDir(null), "/repos/${_viewModel.sourceName}")
-        if (!direct.exists()) {
-            direct.mkdirs()
-        }
-
         val downloadID = downloadUtils.startDownload(
             Uri.parse(url),
             fileName,
             getString(R.string.app_description),
-            "$direct/$fileName"
+            "/repos/${_viewModel.sourceName}/$fileName"
         )
         createDownloadingNotification(downloadID)
 
