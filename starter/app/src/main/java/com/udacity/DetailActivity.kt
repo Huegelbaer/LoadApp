@@ -43,9 +43,9 @@ class DetailActivity : AppCompatActivity() {
                 downloadModel = download
                 fileNameValue.text = download.name
                 statusValue.text = when (download.status) {
-                    DownloadModel.Status.SUCCESS -> "SUCCESS"
-                    DownloadModel.Status.FAIL -> "FAIL"
-                    DownloadModel.Status.UNKNOWN -> "UNKNOWN"
+                    DownloadModel.Status.SUCCESS -> getString(R.string.download_state_completed)
+                    DownloadModel.Status.FAIL -> getString(R.string.download_state_failed)
+                    DownloadModel.Status.UNKNOWN -> getString(R.string.download_state_unknown)
                 }
             }
     }

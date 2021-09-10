@@ -26,4 +26,8 @@
     <string name="status_title">Status:</string>
     <string name="open_file_button">Open file</string>
     <string name="can_not_open_file">File could not be opened!</string>
+
+    <string name="download_state_completed">SUCCESS</string>
+    <string name="download_state_failed">FAIL</string>
+    <string name="download_state_unknown">UNKNOWN</string>
 </resources>
