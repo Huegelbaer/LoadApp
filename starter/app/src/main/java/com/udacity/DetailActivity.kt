@@ -1,9 +1,8 @@
 package com.udacity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.udacity.utils.NotificationUtils
@@ -23,33 +22,7 @@ class DetailActivity : AppCompatActivity() {
         handleDownloadIntent(intent)
 
         openFileButton.setOnClickListener {
-            downloadModel?.let { it ->
-                if (it.status == DownloadModel.Status.SUCCESS) {
-                    it.fileUrl?.let { fileUrl ->
-                        val url = fileUrl.removePrefix("file://")
-                        val file = File(url)
-                        val uri = FileProvider.getUriForFile(
-                            applicationContext,
-                            "${BuildConfig.APPLICATION_ID}.fileProvider",
-                            file)
-
-                        val intent = Intent(Intent.ACTION_VIEW)
-                            .setData(uri)
-                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                        try {
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            val lastSegment = uri.lastPathSegment
-                            val newUrl = url.removeSuffix(lastSegment!!)
-                            val selectedUri = Uri.parse(newUrl)
-                            val newIntent = Intent(Intent.ACTION_VIEW)
-                                .setDataAndType(selectedUri, "resource/folder")
-                            startActivity(newIntent)
-                        }
-                    }
-                }
-            }
+            handleOpenFileButtonClicked()
         }
     }
 
@@ -64,5 +37,43 @@ class DetailActivity : AppCompatActivity() {
                     DownloadModel.Status.UNKNOWN -> "UNKNOWN"
                 }
             }
+    }
+
+    private fun handleOpenFileButtonClicked() {
+        downloadModel?.let { download ->
+            if (download.status == DownloadModel.Status.SUCCESS) {
+                download.fileUrl?.let { fileUrl ->
+                    openFile(fileUrl)
+                }
+            }
+        }
+    }
+
+    private fun openFile(fileUrl: String) {
+        val fileUrlWithoutSchema = fileUrl.removePrefix("file://")
+        val file = File(fileUrlWithoutSchema)
+
+        val uri = FileProvider.getUriForFile(
+            applicationContext,
+            "${BuildConfig.APPLICATION_ID}.fileProvider",
+            file
+        )
+
+        val intent = Intent(Intent.ACTION_VIEW)
+            .setData(uri)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        try {
+            startActivity(
+                Intent.createChooser(
+                    intent,
+                    resources.getString(R.string.open_file_button)
+                )
+            )
+        } catch (e: Exception) {
+            Toast
+                .makeText(applicationContext, R.string.can_not_open_file, Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 }
