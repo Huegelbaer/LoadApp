@@ -16,17 +16,17 @@ class DownloadUtils(private val downloadManager: DownloadManager) {
         RUNNING, PAUSED, PENDING, FAILED, SUCCESS
     }
 
-    fun getInfo(downloadId: Long, url: String? = null): DownloadModel {
+    fun getInfo(downloadId: Long, repository: String?, url: String? = null): DownloadModel {
         if (downloadId < 0) {
-            return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url, null)
+            return DownloadModel(downloadId, null, repository, DownloadModel.Status.FAIL, url, null)
         }
 
         val cursor = downloadManager.query(
             DownloadManager.Query().setFilterById(downloadId)
-        ) ?:return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url, null)
+        ) ?:return DownloadModel(downloadId, null, repository, DownloadModel.Status.FAIL, url, null)
 
         if (!cursor.moveToFirst()) {
-            return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url, null)
+            return DownloadModel(downloadId, null, repository, DownloadModel.Status.FAIL, url, null)
         }
 
         val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
@@ -49,7 +49,7 @@ class DownloadUtils(private val downloadManager: DownloadManager) {
             else -> DownloadModel.Status.UNKNOWN
         }
 
-        return DownloadModel(downloadId, name, status, uri, localUri)
+        return DownloadModel(downloadId, name, repository, status, uri, localUri)
     }
 
     fun startDownload(uri: Uri, title: String, description: String, path: String): Long {

@@ -1,9 +1,10 @@
 package com.udacity
 
+import android.app.Application
 import android.webkit.URLUtil
 import androidx.lifecycle.*
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
     enum class DownloadSource {
         GLIDE, PROJECT, RETROFIT, CUSTOM_URL
@@ -38,6 +39,17 @@ class MainViewModel: ViewModel() {
                 DownloadSource.PROJECT -> PROJECT_URL
                 DownloadSource.RETROFIT -> RETROFIT_URL
                 DownloadSource.CUSTOM_URL -> _customURL
+                else -> null
+            }
+        }
+
+    val repositoryName: Int?
+        get() {
+            return when (_source) {
+                DownloadSource.GLIDE -> R.string.repository_glide
+                DownloadSource.PROJECT -> R.string.repository_load_app
+                DownloadSource.RETROFIT -> R.string.repository_retrofit
+                DownloadSource.CUSTOM_URL -> R.string.repository_custom_url
                 else -> null
             }
         }
