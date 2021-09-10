@@ -18,12 +18,23 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 
         handleDownloadIntent(intent)
 
         openFileButton.setOnClickListener {
             handleOpenFileButtonClicked()
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout)
+        return true
     }
 
     private fun handleDownloadIntent(intent: Intent) {
