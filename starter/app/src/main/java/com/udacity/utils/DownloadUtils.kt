@@ -2,6 +2,7 @@ package com.udacity.utils
 
 import android.app.DownloadManager
 import android.net.Uri
+import android.os.Environment
 import com.udacity.DownloadModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,15 +18,15 @@ class DownloadUtils(private val downloadManager: DownloadManager) {
 
     fun getInfo(downloadId: Long, url: String? = null): DownloadModel {
         if (downloadId < 0) {
-            return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url)
+            return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url, null)
         }
 
         val cursor = downloadManager.query(
             DownloadManager.Query().setFilterById(downloadId)
-        ) ?:return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url)
+        ) ?:return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url, null)
 
         if (!cursor.moveToFirst()) {
-            return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url)
+            return DownloadModel(downloadId, null, DownloadModel.Status.FAIL, url, null)
         }
 
         val statusColumn = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
@@ -37,6 +38,9 @@ class DownloadUtils(private val downloadManager: DownloadManager) {
         val uriColumn = cursor.getColumnIndex(DownloadManager.COLUMN_URI)
         val uri = cursor.getString(uriColumn)
 
+        val localUriColumn = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+        val localUri = cursor.getString(localUriColumn)
+
         cursor.close()
 
         val status = when (statusInt) {
@@ -45,14 +49,15 @@ class DownloadUtils(private val downloadManager: DownloadManager) {
             else -> DownloadModel.Status.UNKNOWN
         }
 
-        return DownloadModel(downloadId, name, status, uri)
+        return DownloadModel(downloadId, name, status, uri, localUri)
     }
 
-    fun startDownload(uri: Uri, title: String, description: String): Long {
+    fun startDownload(uri: Uri, title: String, description: String, path: String): Long {
         val request =
             DownloadManager.Request(uri)
                 .setTitle(title)
                 .setDescription(description)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, path)
                 .setRequiresCharging(false)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
@@ -76,9 +81,9 @@ class DownloadUtils(private val downloadManager: DownloadManager) {
                     DownloadManager.STATUS_PAUSED -> downloadStatus = DownloadStatus(Status.PAUSED)
                     DownloadManager.STATUS_PENDING -> downloadStatus = DownloadStatus(Status.PENDING)
                     DownloadManager.STATUS_RUNNING -> {
-                        val total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                        val total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
                         if (total >= 0) {
-                            val downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                            val downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
                             progress = downloaded.toDouble()/ total.toDouble() * 100L
                         }
                         downloadStatus = DownloadStatus(Status.RUNNING, progress.toInt())

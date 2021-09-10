@@ -24,4 +24,6 @@
     <string name="url_invalid_toast">Please enter a valid url</string>
     <string name="file_name_title">File name:</string>
     <string name="status_title">Status:</string>
+    <string name="open_file_button">Open file</string>
+    <string name="can_not_open_file">File could not be opened!</string>
 </resources>

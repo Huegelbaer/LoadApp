@@ -73,6 +73,8 @@ class NotificationUtils(
             .setOnlyAlertOnce(false)
             .build()
 
+        // cancel notification to ensure the completed notification will be shown
+        notificationManager.cancel(id)
         notificationManager.notify(id, notification)
     }
 
@@ -96,6 +98,8 @@ class NotificationUtils(
             .setOnlyAlertOnce(false)
             .build()
 
+        // cancel notification to ensure the failure notification will be shown
+        notificationManager.cancel(id)
         notificationManager.notify(id, notification)
     }
 

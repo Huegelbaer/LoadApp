@@ -2,13 +2,12 @@ package com.udacity
 
 import android.app.DownloadManager
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.webkit.MimeTypeMap
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -20,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -98,15 +98,21 @@ class MainActivity : AppCompatActivity() {
         val url = _viewModel.downloadURL ?: return withContext(Dispatchers.Main) {
             showNoFileSelectedToast()
         }
-
         if (!_viewModel.isDownloadUrlValid()) return withContext(Dispatchers.Main) {
             showInvalidURLToast()
         }
 
+        val fileName =  URLUtil.guessFileName(
+            url,
+            null,
+            MimeTypeMap.getFileExtensionFromUrl(url)
+        )
+
         val downloadID = downloadUtils.startDownload(
             Uri.parse(url),
-            getString(R.string.app_name),
-            getString(R.string.app_description)
+            fileName,
+            getString(R.string.app_description),
+            "/repos/${_viewModel.sourceName}/$fileName"
         )
         createDownloadingNotification(downloadID)
 
