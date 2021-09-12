@@ -11,7 +11,6 @@ import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.udacity.utils.DownloadUtils
 import com.udacity.utils.NotificationUtils
@@ -49,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             _viewModel.onDownloadSourceSelected(source)
         }
 
-        _viewModel.shouldShowURLInput.observe(this, Observer {
+        _viewModel.shouldShowURLInput.observe(this, {
             it?.let {
                 if (it) {
                     edit_custom_url.visibility = View.VISIBLE

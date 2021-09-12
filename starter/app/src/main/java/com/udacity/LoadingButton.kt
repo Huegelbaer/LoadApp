@@ -4,9 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 
@@ -25,7 +23,7 @@ class LoadingButton @JvmOverloads constructor(
     private var valueAnimator = ValueAnimator()
     private var progressValue : Float = 0.0f
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
+    private var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { p, old, new ->
 
     }
 

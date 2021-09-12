@@ -1,6 +1,5 @@
 package com.udacity
 
-import android.app.Application
 import android.webkit.URLUtil
 import androidx.lifecycle.*
 
