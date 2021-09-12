@@ -35,4 +35,10 @@
     <string name="download_state_completed">SUCCESS</string>
     <string name="download_state_failed">FAIL</string>
     <string name="download_state_unknown">UNKNOWN</string>
+
+    <string name="dialog_title_information">Information</string>
+    <string name="dialog_title_filename">Filename</string>
+    <string name="dialog_title_repository">Repository</string>
+    <string name="dialog_title_file_path">File path</string>
+    <string name="dialog_title_link">Url</string>
 </resources>

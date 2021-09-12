@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.fragment.app.DialogFragment
 import com.udacity.utils.NotificationUtils
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 import java.io.File
 
-class DetailActivity : AppCompatActivity() {
+class DetailActivity : AppCompatActivity(), InformationDialogFragment.NoticeDialogListener {
 
     private var downloadModel: DownloadModel? = null
 
@@ -20,11 +21,10 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-
         handleDownloadIntent(intent)
 
-        openFileButton.setOnClickListener {
-            handleOpenFileButtonClicked()
+        fab.setOnClickListener {
+            showInformation()
         }
     }
 
@@ -35,6 +35,10 @@ class DetailActivity : AppCompatActivity() {
         startActivity(intent)
         overridePendingTransition(R.anim.fadein, R.anim.fadeout)
         return true
+    }
+
+    override fun onDialogButtonClick(dialog: DialogFragment) {
+        handleOpenFileButtonClicked()
     }
 
     private fun handleDownloadIntent(intent: Intent) {
@@ -57,6 +61,14 @@ class DetailActivity : AppCompatActivity() {
                     openFile(fileUrl)
                 }
             }
+        }
+    }
+
+    private fun showInformation() {
+        downloadModel?.let { model ->
+            val dialog = InformationDialogFragment(model)
+            dialog.listener = this
+            dialog.show(supportFragmentManager, "InformationDialog")
         }
     }
 
