@@ -11,7 +11,6 @@ import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.udacity.utils.DownloadUtils
 import com.udacity.utils.NotificationUtils
@@ -19,8 +18,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import java.io.File
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             _viewModel.onDownloadSourceSelected(source)
         }
 
-        _viewModel.shouldShowURLInput.observe(this, Observer {
+        _viewModel.shouldShowURLInput.observe(this, {
             it?.let {
                 if (it) {
                     edit_custom_url.visibility = View.VISIBLE
@@ -114,19 +111,21 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.app_description),
             "/repos/${_viewModel.sourceName}/$fileName"
         )
-        createDownloadingNotification(downloadID)
+
+        val repository = getString(_viewModel.repositoryName ?: -1)
+        createDownloadingNotification(downloadID, repository)
 
         downloadUtils.observeDownload(downloadID).collect {
             withContext(Dispatchers.Main) {
                 when (it.status) {
                     DownloadUtils.Status.RUNNING -> {
-                        createDownloadingNotification(downloadID, it.progress ?: 0)
+                        createDownloadingNotification(downloadID, repository, it.progress ?: 0)
                     }
                     DownloadUtils.Status.FAILED -> {
-                        createDownloadFailedNotification(downloadID, url)
+                        createDownloadFailedNotification(downloadID, url, repository)
                     }
                     DownloadUtils.Status.SUCCESS -> {
-                        createDownloadCompletedNotification(downloadID)
+                        createDownloadCompletedNotification(downloadID, repository)
                     }
                     else -> { }
                 }
@@ -144,36 +143,38 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(application, text, Toast.LENGTH_LONG).show()
     }
 
-    private fun createDownloadingNotification(id: Long, progress: Int = 0) {
+    private fun createDownloadingNotification(id: Long, repository: String?, progress: Int = 0) {
+        val download = downloadUtils.getInfo(id, repository)
+
         notificationUtils.createDownloadingNotification(
             id.toInt(),
             getString(R.string.notification_title),
-            getString(R.string.notification_download_complete_description),
+            getString(R.string.notification_download_running_description, download.name, repository),
             progress
         )
     }
 
-    private fun createDownloadCompletedNotification(id: Long) {
-        val download = downloadUtils.getInfo(id)
+    private fun createDownloadCompletedNotification(id: Long, repository: String?) {
+        val download = downloadUtils.getInfo(id, repository)
 
         notificationUtils.createDownloadCompletedNotification(
             id.toInt(),
             download,
             getString(R.string.notification_title),
-            getString(R.string.notification_download_complete_description),
+            getString(R.string.notification_download_complete_description, download.name, repository),
             getString(R.string.notification_button)
         )
     }
 
-    private fun createDownloadFailedNotification(id: Long, url: String) {
-        val download = downloadUtils.getInfo(id, url)
+    private fun createDownloadFailedNotification(id: Long, url: String, repository: String?) {
+        val download = downloadUtils.getInfo(id, repository, url)
 
         notificationUtils.createDownloadFailedNotification(
             id.toInt(),
             download,
             url,
             getString(R.string.notification_title),
-            getString(R.string.notification_download_failed_description),
+            getString(R.string.notification_download_failed_description, download.name, repository),
             getString(R.string.notification_retry_button),
             getString(R.string.notification_button_failed)
         )

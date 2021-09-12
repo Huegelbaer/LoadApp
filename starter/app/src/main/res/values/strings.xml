@@ -5,9 +5,9 @@
 
 
     <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
-    <string name="notification_download_complete_description">The Project 3 repository is downloaded</string>
-    <string name="notification_download_failed_description">Download of The Project 3 repository failed</string>
-    <string name="notification_download_running_description">downloading…</string>
+    <string name="notification_download_complete_description">%1$s of repository %2$s is downloaded</string>
+    <string name="notification_download_failed_description">Download %1$s of repository %2$s failed</string>
+    <string name="notification_download_running_description">downloading %1$s of repository %2$s…</string>
     <string name="notification_button">See changes</string>
     <string name="notification_button_failed">See information</string>
     <string name="notification_retry_button">Retry</string>
@@ -20,10 +20,25 @@
     <string name="radio_button_retrofit">Retrofit - Type-safe HTTP Client for Android and Java by Square, Inc</string>
     <string name="radio_button_custom_url">URL</string>
 
+    <string name="repository_glide">Glide</string>
+    <string name="repository_load_app">LoadApp</string>
+    <string name="repository_retrofit">Retrofit</string>
+    <string name="repository_custom_url">URL</string>
+
     <string name="no_file_selected_toast">Please select the file to download</string>
     <string name="url_invalid_toast">Please enter a valid url</string>
     <string name="file_name_title">File name:</string>
     <string name="status_title">Status:</string>
     <string name="open_file_button">Open file</string>
     <string name="can_not_open_file">File could not be opened!</string>
+
+    <string name="download_state_completed">SUCCESS</string>
+    <string name="download_state_failed">FAIL</string>
+    <string name="download_state_unknown">UNKNOWN</string>
+
+    <string name="dialog_title_information">Information</string>
+    <string name="dialog_title_filename">Filename</string>
+    <string name="dialog_title_repository">Repository</string>
+    <string name="dialog_title_file_path">File path</string>
+    <string name="dialog_title_link">Url</string>
 </resources>

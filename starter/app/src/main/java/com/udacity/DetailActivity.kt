@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.fragment.app.DialogFragment
 import com.udacity.utils.NotificationUtils
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 import java.io.File
 
-class DetailActivity : AppCompatActivity() {
+class DetailActivity : AppCompatActivity(), InformationDialogFragment.NoticeDialogListener {
 
     private var downloadModel: DownloadModel? = null
 
@@ -18,12 +19,26 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         handleDownloadIntent(intent)
 
-        openFileButton.setOnClickListener {
-            handleOpenFileButtonClicked()
+        fab.setOnClickListener {
+            showInformation()
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout)
+        return true
+    }
+
+    override fun onDialogButtonClick(dialog: DialogFragment) {
+        handleOpenFileButtonClicked()
     }
 
     private fun handleDownloadIntent(intent: Intent) {
@@ -32,9 +47,9 @@ class DetailActivity : AppCompatActivity() {
                 downloadModel = download
                 fileNameValue.text = download.name
                 statusValue.text = when (download.status) {
-                    DownloadModel.Status.SUCCESS -> "SUCCESS"
-                    DownloadModel.Status.FAIL -> "FAIL"
-                    DownloadModel.Status.UNKNOWN -> "UNKNOWN"
+                    DownloadModel.Status.SUCCESS -> getString(R.string.download_state_completed)
+                    DownloadModel.Status.FAIL -> getString(R.string.download_state_failed)
+                    DownloadModel.Status.UNKNOWN -> getString(R.string.download_state_unknown)
                 }
             }
     }
@@ -46,6 +61,14 @@ class DetailActivity : AppCompatActivity() {
                     openFile(fileUrl)
                 }
             }
+        }
+    }
+
+    private fun showInformation() {
+        downloadModel?.let { model ->
+            val dialog = InformationDialogFragment(model)
+            dialog.listener = this
+            dialog.show(supportFragmentManager, "InformationDialog")
         }
     }
 

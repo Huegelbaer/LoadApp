@@ -3,7 +3,7 @@ package com.udacity
 import android.webkit.URLUtil
 import androidx.lifecycle.*
 
-class MainViewModel(): ViewModel() {
+class MainViewModel : ViewModel() {
 
     enum class DownloadSource {
         GLIDE, PROJECT, RETROFIT, CUSTOM_URL
@@ -23,8 +23,6 @@ class MainViewModel(): ViewModel() {
     private var _customURL: String? = null
 
     private var _selectedSource = MutableLiveData<DownloadSource>()
-    val selectedSource: LiveData<DownloadSource>
-        get() = _selectedSource
 
     val shouldShowURLInput: LiveData<Boolean> = Transformations.map(_selectedSource) { source ->
         source == DownloadSource.CUSTOM_URL
@@ -32,16 +30,6 @@ class MainViewModel(): ViewModel() {
 
     private var _enteredCustomURL = MutableLiveData<String>()
 
-    val isSourceValid = MediatorLiveData<Boolean>()
-
-    init {
-        isSourceValid.addSource(_selectedSource) {
-            updateIsSourceValid(it, _customURL)
-        }
-        isSourceValid.addSource(_enteredCustomURL) { url ->
-            updateIsSourceValid(_source, url)
-        }
-    }
 
     val downloadURL: String?
         get() {
@@ -50,6 +38,17 @@ class MainViewModel(): ViewModel() {
                 DownloadSource.PROJECT -> PROJECT_URL
                 DownloadSource.RETROFIT -> RETROFIT_URL
                 DownloadSource.CUSTOM_URL -> _customURL
+                else -> null
+            }
+        }
+
+    val repositoryName: Int?
+        get() {
+            return when (_source) {
+                DownloadSource.GLIDE -> R.string.repository_glide
+                DownloadSource.PROJECT -> R.string.repository_load_app
+                DownloadSource.RETROFIT -> R.string.repository_retrofit
+                DownloadSource.CUSTOM_URL -> R.string.repository_custom_url
                 else -> null
             }
         }
@@ -66,10 +65,6 @@ class MainViewModel(): ViewModel() {
 
     fun isDownloadUrlValid(): Boolean {
         return isSourceValid(_source, _customURL)
-    }
-
-    private fun updateIsSourceValid(source: DownloadSource?, url: String?) {
-        isSourceValid.value = isSourceValid(source, url)
     }
 
     private fun isSourceValid(source: DownloadSource?, url: String?): Boolean {

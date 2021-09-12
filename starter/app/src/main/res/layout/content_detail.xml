@@ -41,10 +41,4 @@
         android:textSize="@dimen/default_text_size"
         tools:text="Success" />
 
-    <Button
-        android:id="@+id/openFileButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/open_file_button"
-        android:visibility="invisible" />
 </androidx.constraintlayout.motion.widget.MotionLayout>
